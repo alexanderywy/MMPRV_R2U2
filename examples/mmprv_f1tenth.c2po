@@ -1,0 +1,8 @@
+INPUT
+    x_ego,y_ego,x_opp,y_opp: float;
+
+DEFINE
+    a := sqrt(((x_ego - x_opp) pow 2.0) + ((y_ego - y_opp) pow 2.0)) > 0.58;
+
+FTSPEC
+    P_0.80(G[0,3] a) with d = -16, K = 216;

@@ -1,0 +1,27 @@
+BZ b0  iload  0 0
+BZ b1  iload  1 0
+BZ b2  iload  2 0
+TL n0  load   a0
+TL n1  load   a1
+TL n2  load   a2
+TL n3  and    n1 n2
+TL n4  until  True n3
+TL n5  and    n0 n4
+TL n6  return n5 0
+TL n7  return n5 1
+TL n8  return n5 2
+CG TL DUOQ q0 |7|
+CG TL DUOQ q1 |1|
+CG TL DUOQ q2 |1|
+CG TL DUOQ q3 |1|
+CG TL DUOQ q4 |5|
+CG TL TEMP q4 [0, 3]
+CG TL DUOQ q5 |1|
+CG TL DUOQ q6 |1|
+CG TL DUOQ q7 |3|
+CG TL PREDICT q7 d=4294967293, K=1
+CG TL DUOQ q8 |3|
+CG TL PREDICT q8 d=2, K=1
+F __f0__ 0
+F __f1__ 1
+F __f2__ 2

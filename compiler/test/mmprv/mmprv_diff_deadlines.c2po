@@ -1,0 +1,7 @@
+INPUT
+b0,b1,b2:bool;
+
+FTSPEC
+b0 && (F[0,3](b1 && b2));
+b0 && (F[0,3](b1 && b2)) with d = -3;
+b0 && (F[0,3](b1 && b2)) with d = 2;

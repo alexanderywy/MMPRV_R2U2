@@ -1,0 +1,30 @@
+\section{Run R2U2 in Vivado Simulation}
+(Tested in Vivado 2017.02)
+\subsection{Name of Binary Files:}
+The HW simulator takes the binary assembly code as input. There are three binary files that are necessary to run the HW simulation:
+\begin{itemize}
+\item *.trc: Input signal at each time stamp;
+\item *int: Intervals of certain operations;
+\item *imem: Binary assembly code without interval.
+\end{itemize}
+
+\subsection{Steps to build the project:}
+\begin{enumerate}
+  \item In vivado command window, \textbf{cd} into the folder\\
+  \textbf{/r2u2/R2U2\_HW/Hardware/hdl/ftMuMonitor/vivado}
+  \item Click Tools$\rightarrow$ Run Tcl Script. Then Choose the .tcl file under current directory
+  \item Rewrite the *.trc, *.int, *.imem to test different cases (Refer to \hyperlink{gb}{"How to generate binary file for the HW test" })
+  \item The async result is shown in the file \textbf{async\_out.txt} under the folder\\
+  \textbf{/r2u2/R2U2\_HW/Hardware/hdl/ftMuMonitor/vivado/FT\_Monitor/FT\_Monitor.sim/\\
+  sim\_1/behav}
+\end{enumerate}
+\hypertarget{gb}{\subsection{How to generate binary file for the HW test:}}
+\begin{enumerate}
+	\item Write the assembly code in casestudy.ftasm under directory\\
+ \textbf{r2u2/R2U2\_HW/Software/ftAssembler/}
+	\item run \textbf{./convert.sh} under that folder. The script will call the python script to generate the binary file (*.imem, *.int). It will automatically copy these files into the vivado project.
+	\item The input signal is called \textbf{atomic.trc} located under \\
+\textbf{r2u2/R2U2\_HW/Hardware/hdl/ftMuMonitor/sim/testbench/}. Each signal is written into a column. The first signal is in column 0.
+\end{enumerate}
+
+\clearpage

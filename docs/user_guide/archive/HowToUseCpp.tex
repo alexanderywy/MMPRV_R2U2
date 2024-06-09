@@ -1,0 +1,71 @@
+\section{R2U2 Software (Cpp)}
+(Require C++11)
+
+\subsection{Assembly Mode Configuration}
+In main file MTL.cpp:
+\begin{enumerate}
+\item  Assign the sensor number, simulation time stamps;
+\item  Link the sensor to the .log file;
+\end{enumerate}
+\begin{lstlisting}[language=C]
+sensor[0]=new Event("./src/alt.log");
+sensor[1]=new Event("./src/pitch.log");
+\end{lstlisting}
+
+In assembly code file test.ftasm:
+\begin{enumerate}
+\item Write the assembly code in test.ftasm
+\item Specify the assembly code file
+\end{enumerate}
+\begin{lstlisting}[language=C]
+string asm_file="./src/test.ftasm";
+\end{lstlisting}
+
+\subsection{MLTL Mode Configuration:}
+In main file MTL.cpp:
+\begin{enumerate}
+\item Assign the sensor number, simulation time stamps;
+\item Link the sensor to the .log file;
+\item Write your MTL formula as a string in MTL.cpp. For MTL format, see Notes;
+\end{enumerate}
+
+
+\subsection{How to Run}
+In terminal:
+\begin{enumerate}
+\item run setup.sh to compile the project
+\begin{lstlisting}[language=Bash]
+bash setup.sh
+\end{lstlisting}
+\item type ./Debug/MTL to running MTL
+\begin{lstlisting}[language=Bash]
+bash ./Debug/MTL
+\end{lstlisting}
+\end{enumerate}
+
+Notes: Meaning the MTL String:
+\begin{lstlisting}[language=C]
+Algorithm 1: "!" = "NOT{}"
+Algorithm 2: "G[2]" = "KEP[2]{}"
+Algorithm 3: "&" = "AND{,}"
+Algorithm 4: "G[2,5]" = "ALW[2,5]{}"
+Algorithm 5: "F[1,2]" = "UNT[1,2]{,}"
+\end{lstlisting}
+
+\begin{lstlisting}[language=C]
+string formula="NOT{S[0]}";
+string formula="NOT{NOT{S[0]}}";
+string formula="KEP[5]{S[1]}";
+string formula="NOT{KEP[2]{NOT{S[1]}}}";
+string formula="AND{KEP[2]{S[0]},S[1]}";
+string formula="ALW[5,10]{S[1]}";
+string formula="NOT{AND{ALW[5,10]{S[0]},KEP[2]{S[1]}}}";
+string formula="AND{KEP[2]{NOT{NOT{S[0]}}},S[0]}";
+string formula="AND{S[1],ALW[0,8]{S[0]}}";
+string formula="AND{S[1],KEP[8]{S[0]}}";
+string formula="AND{ALW[5,10]{S[0]},KEP[2]{S[1]}}";
+string formula="KEP[2]{S[1]}";
+string formula="AND{AND{S[0],S[1]},ALW[3,5]{S[0]}}";
+\end{lstlisting}
+
+\clearpage

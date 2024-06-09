@@ -1,0 +1,48 @@
+BZ b0  iload  0 0
+BZ b1  iload  1 0
+TL n0  load   a0
+TL n1  return n0 0
+TL n2  load   a0
+TL n3  global n2
+TL n4  prob   n3
+TL n5  load   a1
+TL n6  and    n4 n5
+TL n7  return n6 1
+TL n8  load   a1
+TL n9  until  True n8
+TL n10 prob   n9
+TL n11 until  n0 n10
+TL n12 return n11 2
+TL n13 global n8
+TL n14 and    n2 n13
+TL n15 prob   n14
+TL n16 return n15 3
+CG TL DUOQ q0 |5|
+CG TL DUOQ q1 |3|
+CG TL PREDICT q1 d=4294967293, K=3
+CG TL DUOQ q2 |8| <2000000>
+CG TL DUOQ q3 |6| <3000000>
+CG TL TEMP q3 [0, 1]
+CG TL DUOQ q4 |1| <400000>
+CG TL DUOQ q5 |3|
+CG TL DUOQ q6 |1|
+CG TL DUOQ q7 |3|
+CG TL PREDICT q7 d=4294967295, K=3
+CG TL DUOQ q8 |6| <2000000>
+CG TL DUOQ q9 |6| <3000000>
+CG TL TEMP q9 [1, 2]
+CG TL DUOQ q10 |1| <950000>
+CG TL DUOQ q11 |5|
+CG TL TEMP q11 [0, 2]
+CG TL DUOQ q12 |3|
+CG TL PREDICT q12 d=1, K=3
+CG TL DUOQ q13 |6| <3000000>
+CG TL TEMP q13 [0, 1]
+CG TL DUOQ q14 |2| <2000000>
+CG TL DUOQ q15 |1| <600000>
+CG TL DUOQ q16 |3|
+CG TL PREDICT q16 d=0, K=3
+F __f0__ 0
+F __f1__ 1
+F __f2__ 2
+F __f3__ 3

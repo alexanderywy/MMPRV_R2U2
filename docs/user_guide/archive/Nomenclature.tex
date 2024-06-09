@@ -1,0 +1,14 @@
+\section{Nomenclature}
+All the informaiton requried to use R2U2 is called the \emph{configuration}.
+A R2U2 configuration incudes \emph{design-time configuration} and \emph{runtime configuration}.
+The design time configuration provides additional informtion to an \emph{implmentation} of the R2U2 engine to create a \emph{unit}.
+A depoloyed unit can monitor different specificaitons at runtime by loading different runtime configurations.
+
+\begin{description}
+    \item[R2U2 Configuration]{A combination of the requried design time and runtime infoamtion to deploy R2U2}
+    \item[Design-time Configuration]{Settings for tailoring the R2U2 engine for a deployment, e.g. compiler settings, FPGA parameters, etc.}
+    \item[Runtime Configuration]{Specificaitons to be monitored by R2U2}
+    \item[Implmentation]{The source of an R2U2 engine, written in a programming or hardware description language}
+    \item[Unit]{The result of configuring an R2U2 implmentation, executable bytecode or sythezized hardware}
+    \item[Deployment]{One or many R2U2 units targeted at, and configured to provide system health monitoring for, a system.}
+\end{description}

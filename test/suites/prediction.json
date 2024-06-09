@@ -1,0 +1,53 @@
+{
+    "suite": "prediction",
+    "options": {
+        "booleanizer":  true,
+        "impl":  "c"
+    },
+    "tests": [
+        {
+            "name": "probability",
+            "mltl":  "mmprv0000.c2po",
+            "trace":  "mmprv0000.csv",
+            "prob_trace": "mmprv0000_prob.csv",
+            "oracle":  "mmprv0000.log"
+        },
+        {
+            "name": "mprv",
+            "mltl":  "mmprv0001.c2po",
+            "trace":  "mmprv0001.csv",
+            "oracle":  "mmprv0001.log"
+        },
+        {
+            "name": "mprv_part2",
+            "mltl":  "mmprv0002.c2po",
+            "trace":  "mmprv0002.csv",
+            "oracle":  "mmprv0002.log"
+        },
+        {
+            "name": "mmprv",
+            "mltl":  "mmprv0003.c2po",
+            "trace":  "mmprv0003.csv",
+            "prob_trace": "mmprv0003_prob.csv",
+            "oracle":  "mmprv0003.log",
+            "options": {
+                "booleanizer": false,
+                "atomic-checkers": false
+            }
+        },
+        {
+            "name": "mmprv mmTransformer",
+            "mltl":  "mmprv_mmTransformer.c2po",
+            "trace":  "mmprv_mmTransformer.csv",
+            "prob_trace": "mmprv_mmTransformer_prob.csv",
+            "oracle":  "mmprv_mmTransformer.log"
+        },
+        {
+            "name": "mmprv F1Tenth",
+            "mltl":  "mmprv_F1Tenth.c2po",
+            "trace":  "mmprv_F1Tenth.csv",
+            "prob_trace": "mmprv_F1Tenth_prob.csv",
+            "oracle":  "mmprv_F1Tenth.log"
+        }
+    ]
+}
