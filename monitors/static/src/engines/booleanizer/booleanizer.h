@@ -46,7 +46,9 @@ typedef enum r2u2_bz_opcode {
     R2U2_BZ_OP_IPOW    = 0b011110,
     R2U2_BZ_OP_FPOW    = 0b011111,
     R2U2_BZ_OP_ISQRT   = 0b100000,
-    R2U2_BZ_OP_FSQRT   = 0b100001
+    R2U2_BZ_OP_FSQRT   = 0b100001,
+    R2U2_BZ_OP_IPREV   = 0b100010,
+    R2U2_BZ_OP_FPREV   = 0b100011,
 
 } r2u2_bz_opcode_t;
 

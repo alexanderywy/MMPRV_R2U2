@@ -65,10 +65,12 @@ class BZOperator(Enum):
     IDIV = 0b011011
     FDIV = 0b011100
     MOD = 0b011101
-    IPOW    = 0b011110
-    FPOW    = 0b011111
-    ISQRT   = 0b100000
-    FSQRT   = 0b100001
+    IPOW  = 0b011110
+    FPOW  = 0b011111
+    ISQRT = 0b100000
+    FSQRT = 0b100001
+    IPREV = 0b100010
+    FPREV = 0b100011
 
     def is_constant(self) -> bool:
         return self is BZOperator.ICONST or self is BZOperator.FCONST
@@ -99,6 +101,8 @@ BZ_OPERATOR_MAP: dict[tuple[cpt.OperatorKind, bool], BZOperator] = {
     (cpt.OperatorKind.ARITHMETIC_POWER, False): BZOperator.FPOW,
     (cpt.OperatorKind.ARITHMETIC_SQRT, True): BZOperator.ISQRT,
     (cpt.OperatorKind.ARITHMETIC_SQRT, False): BZOperator.FSQRT,
+    (cpt.OperatorKind.PREVIOUS, True): BZOperator.IPREV,
+    (cpt.OperatorKind.PREVIOUS, False): BZOperator.FPREV,
     (cpt.OperatorKind.EQUAL, True): BZOperator.IEQ,
     (cpt.OperatorKind.EQUAL, False): BZOperator.FEQ,
     (cpt.OperatorKind.NOT_EQUAL, True): BZOperator.INEQ,
@@ -539,8 +543,13 @@ def gen_bz_instruction(
         else:
             is_int_operator = types.is_integer_type(expr.type)
 
-        expr = cast(cpt.Operator, expr)
-        operator = BZ_OPERATOR_MAP[(expr.operator, is_int_operator)]
+        if expr.operator is cpt.OperatorKind.RATE:
+            expr = cast(cpt.Operator, expr)
+            expr.operator = cpt.OperatorKind.ARITHMETIC_SUBTRACT
+            operator = BZ_OPERATOR_MAP[(expr.operator, is_int_operator)]
+        else:
+            expr = cast(cpt.Operator, expr)
+            operator = BZ_OPERATOR_MAP[(expr.operator, is_int_operator)]
     else:
         operand1 = 0
         operand2 = 0
@@ -953,6 +962,13 @@ def gen_assembly(program: cpt.Program, context: cpt.Context) -> Optional[list[In
             ft_instructions[expr] = new_ft_instruction
             cg_instructions[expr] = gen_ft_duoq_instructions(expr, ft_instructions)
             duoqs += 1
+
+    # Move all PREV booleanizer instructions to the end (i.e., always update the 'previous' 
+    # value after current iteration)
+    for key in list(bz_instructions):
+        if bz_instructions[key].operator is BZOperator.IPREV or \
+                bz_instructions[key].operator is BZOperator.FPREV:
+            bz_instructions[key] = bz_instructions.pop(key)
 
     for expr in cpt.postorder(program.pt_spec_set, context):
         if expr == program.pt_spec_set:

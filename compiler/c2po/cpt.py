@@ -92,6 +92,21 @@ class Expression(Node):
             prev_visited_parents = visited_parents
             visited_parents = []
     
+    def get_descendants(self) -> list[Expression]:
+        prev_visited_children: list[Expression] = [self]
+        visited_children: list[Expression] = []
+        children: list[Expression] = []
+        while(True):  
+            for node in prev_visited_children:
+                for child in node.children:
+                    if not isinstance(child, SpecificationSet):
+                        visited_children.append(child)
+                        children.append(child)
+            if(len(visited_children) == 0):
+                return children
+            prev_visited_children = visited_children
+            visited_children = []
+    
     def get_max_prediction_horizon(self) -> int:
         max_prediction_horizon: int = 0
         for expr in self.get_ancestors():
@@ -487,6 +502,8 @@ class OperatorKind(enum.Enum):
 
     # Other
     COUNT = "count"
+    PREVIOUS = "prev"
+    RATE = "rate"
 
 class Operator(Expression):
     def __init__(
@@ -597,6 +614,14 @@ class Operator(Expression):
     @staticmethod
     def ArithmeticNegate(loc: log.FileLocation, operand: Expression) -> Operator:
         return Operator(loc, OperatorKind.ARITHMETIC_NEGATE, [operand])
+    
+    @staticmethod
+    def RateFunction(loc: log.FileLocation, lhs: Expression, rhs: Expression) -> Operator:
+        return Operator(loc, OperatorKind.RATE, [lhs, rhs])
+    
+    @staticmethod
+    def PreviousFunction(loc: log.FileLocation, operand: Expression) -> Operator:
+        return Operator(loc, OperatorKind.PREVIOUS, [operand])
 
     @staticmethod
     def Equal(loc: log.FileLocation, lhs: Expression, rhs: Expression) -> Operator:
@@ -677,6 +702,7 @@ class Operator(Expression):
         operator.wpd = operand.wpd
         if operator.is_probabilistic_operator(): operator.bpd = operator.wpd
         return operator
+
 
     def __deepcopy__(self, memo) -> Operator:
         children = [copy.deepcopy(c, memo) for c in self.children]
@@ -834,6 +860,7 @@ def is_arithmetic_operator(expr: Expression) -> bool:
         OperatorKind.ARITHMETIC_NEGATE,
         OperatorKind.ARITHMETIC_POWER,
         OperatorKind.ARITHMETIC_SQRT,
+        OperatorKind.RATE,
     }
 
 
@@ -879,6 +906,11 @@ def is_past_time_operator(expr: Expression) -> bool:
 def is_probability_operator(expr: Expression) -> bool:
     return isinstance(expr, Operator) and expr.operator in {
         OperatorKind.PROBABILITY,
+    }
+
+def is_prev_operator(expr: Expression) -> bool:
+    return isinstance(expr, Operator) and expr.operator in {
+        OperatorKind.PREVIOUS,
     }
 
 

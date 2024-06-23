@@ -110,8 +110,12 @@ r2u2_status_t r2u2_instruction_dispatch(r2u2_monitor_t *monitor) {
         break;
       }
       case R2U2_ENG_BZ: {
-        error_cond = r2u2_bz_instruction_dispatch(monitor, (r2u2_bz_instruction_t*)(*monitor->instruction_tbl)[monitor->prog_count].instruction_data);
-        break;
+        if(monitor->progress == R2U2_MONITOR_PROGRESS_FIRST_LOOP){
+          error_cond = r2u2_bz_instruction_dispatch(monitor, (r2u2_bz_instruction_t*)(*monitor->instruction_tbl)[monitor->prog_count].instruction_data);
+          break;
+        }else{
+          break;
+        }
       }
       default: {
           R2U2_DEBUG_PRINT("Warning: Bad Engine Type\n");

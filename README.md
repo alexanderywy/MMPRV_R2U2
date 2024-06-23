@@ -49,10 +49,10 @@ timestamps will appear to be "skipped" - this is normal.
         pushd monitors/static/ && make clean all && popd
 2) Build F1Tenth spec:
 
-        python3 compiler/c2po.py --booleanizer --trace examples/ego_vehicle_trace_K_216_N_20.csv examples/mmprv_F1Tenth.c2po
+        python3 compiler/c2po.py --booleanizer --trace examples/ego_vehicle_trace_K_216_N_30.csv examples/mmprv_F1Tenth.c2po
 3) Run R2U2:
 
-        ./monitors/static/build/r2u2 spec.bin examples/ego_vehicle_trace_K_216_N_20.csv examples/ego_vehicle_trace_prob_K_216_N_20.csv 
+        ./monitors/static/build/r2u2 spec.bin examples/ego_vehicle_trace_K_216_N_30.csv examples/ego_vehicle_trace_prob_K_216_N_30.csv 
 4) Build mmTransformer spec:
 
         python3 compiler/c2po.py --booleanizer --trace examples/14986_trace.csv examples/mmprv_mmTransformer.c2po

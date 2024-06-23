@@ -73,6 +73,7 @@ static r2u2_bool check_operand_data(r2u2_monitor_t *monitor, r2u2_mltl_instructi
           // TODO(bckempa) Add check for discarded top bit in timestamp
         #endif
         // Assuming the cost of the bitops is cheaper than an if branch
+        //*result = r2u2_infinity;
         *result = monitor->time_stamp | (((*(monitor->atomic_buffer[0]))[value]) ? R2U2_TNT_TRUE : R2U2_TNT_FALSE);
         return (monitor->progress == R2U2_MONITOR_PROGRESS_FIRST_LOOP);
 
@@ -277,12 +278,18 @@ r2u2_status_t r2u2_mltl_ft_update(r2u2_monitor_t *monitor, r2u2_mltl_instruction
             if(op0 == r2u2_infinity || (op0 & R2U2_TNT_TIME) < index && ctrl->next_time <= index){ // Last i produced < index; therefore, prediction required
               monitor->predictive_mode = true;
               r2u2_mltl_instruction_t* mltl_instructions[R2U2_MAX_INSTRUCTIONS];
-              r2u2_instruction_t* load_instructions[max(R2U2_MAX_BZ_INSTRUCTIONS, R2U2_MAX_AT_INSTRUCTIONS)];
               r2u2_scq_state_t prev_real_state[R2U2_MAX_INSTRUCTIONS];
-              size_t num_mltl_instructions, num_load_instructions = 0;
-              // Find child instructions for ft and booleanizer assembly (atomic checker not currently supported)
-              r2u2_status_t status = find_child_instructions(monitor, &(*monitor->instruction_tbl)[monitor->prog_count], mltl_instructions, &num_mltl_instructions, 
-                                                              load_instructions, &num_load_instructions, monitor->prog_count - instr->memory_reference);
+              size_t num_mltl_instructions = 0;
+              size_t num_load_instructions = monitor->prog_count - instr->memory_reference; // Number of BZ or AT instructions
+              if(num_load_instructions == 0){
+                r2u2_instruction_t* load_instructions[R2U2_MAX_INSTRUCTIONS];
+                r2u2_status_t status = find_child_instructions(monitor, &(*monitor->instruction_tbl)[monitor->prog_count], mltl_instructions, &num_mltl_instructions, 
+                                                             load_instructions, &num_load_instructions, monitor->prog_count - instr->memory_reference);
+              }
+              else{
+                r2u2_status_t status = find_child_instructions(monitor, &(*monitor->instruction_tbl)[monitor->prog_count], mltl_instructions, &num_mltl_instructions, 
+                                                            NULL, NULL, monitor->prog_count - instr->memory_reference);
+              }
               prep_prediction_scq(monitor, mltl_instructions, instr, prev_real_state, num_mltl_instructions);
               // Keep track of original monitor values
               r2u2_signal_vector_t *signal_vector_original = monitor->signal_vector;
@@ -302,10 +309,10 @@ r2u2_status_t r2u2_mltl_ft_update(r2u2_monitor_t *monitor, r2u2_mltl_instruction
                 for(int j = 0; j < (int)predict->k_modes; j++){
                   // Slide atomic_prob_buffer over to the current mode at the current predicted time step
                   monitor->atomic_prob_buffer = &(*(atomic_prob_buffer_original))[(*(monitor->k_offset_buffer)[1])[j]+(iteration*monitor->num_atomics)];
-                  for(int i = num_load_instructions - 1; i >= 0; i--){ // Dispatch load instructions
+                  for(int i = 0; i < num_load_instructions; i++){ // Dispatch load instructions
                     R2U2_DEBUG_PRINT("%d.%d.%d.%d\n",timestamp_original,iteration, i, j);
-                    if(load_instructions[i]->engine_tag == R2U2_ENG_BZ){ // Booleanizer instructions
-                      r2u2_bz_instruction_t* bz_instr = ((r2u2_bz_instruction_t*)load_instructions[i]->instruction_data);
+                    if((*monitor->instruction_tbl)[i].engine_tag == R2U2_ENG_BZ){ // Booleanizer instructions
+                      r2u2_bz_instruction_t* bz_instr = ((r2u2_bz_instruction_t*)(*monitor->instruction_tbl)[i].instruction_data);
                       // Slide signal_vector over to the current mode at the current predicted time step
                       monitor->signal_vector = &(*(signal_vector_original))[(*(monitor->k_offset_buffer)[0])[j]+(iteration*monitor->num_signals)];
                       if(bz_instr->store && j != 0) {
@@ -329,11 +336,11 @@ r2u2_status_t r2u2_mltl_ft_update(r2u2_monitor_t *monitor, r2u2_mltl_instruction
                       }
                       R2U2_DEBUG_PRINT("Probability: %f\n",temp_prob_buffer[bz_instr->at_addr]);
                     }
-                    else if(load_instructions[i]->engine_tag == R2U2_ENG_AT){
+                    else if((*monitor->instruction_tbl)[i].engine_tag == R2U2_ENG_AT){
                       // To-Do: Atomic checker currently not supported within MMPRV
                     }
-                    else if(load_instructions[i]->engine_tag == R2U2_ENG_TL){ // Loading atomics directly
-                      r2u2_mltl_instruction_t* load_instr = ((r2u2_mltl_instruction_t*)load_instructions[i]->instruction_data);
+                    else if((*monitor->instruction_tbl)[i].engine_tag == R2U2_ENG_TL){ // Loading atomics directly
+                      r2u2_mltl_instruction_t* load_instr = ((r2u2_mltl_instruction_t*)(*monitor->instruction_tbl)[i].instruction_data);
                       // Slide atomic_buffer over to the current mode at the current predicted time step
                       monitor->atomic_buffer[0] = &(*(atomic_vector_original))[(*(monitor->k_offset_buffer)[1])[j]+(iteration*monitor->num_atomics)];
                       if(j != 0) {
@@ -612,9 +619,10 @@ r2u2_status_t r2u2_mltl_ft_update(r2u2_monitor_t *monitor, r2u2_mltl_instruction
           break;
         }
       #endif
-        if (check_operand_data(monitor, instr, 0, &op0)) {
-          push_result(monitor, instr, op0 ^ R2U2_TNT_TRUE);
-        }
+
+      if (check_operand_data(monitor, instr, 0, &op0)) {
+        push_result(monitor, instr, op0 ^ R2U2_TNT_TRUE);
+      }
 
       error_cond = R2U2_OK;
       break;

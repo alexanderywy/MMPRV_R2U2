@@ -1,8 +1,10 @@
 INPUT
-    x_ego,y_ego,x_opp,y_opp: float;
+    v_ego, x_ego,y_ego,x_opp,y_opp: float;
 
 DEFINE
-    a := sqrt(((x_ego - x_opp) pow 2.0) + ((y_ego - y_opp) pow 2.0)) > 0.58;
+    a0 := rate(v_ego) < 0.0;
+    a1 := v_ego <= 0.0000000001;
+    a2 := sqrt(((x_ego - x_opp) pow 2.0) + ((y_ego - y_opp) pow 2.0)) > 0.58;
 
 FTSPEC
-    P_0.80(G[0,3] a) with d = -16, K = 216;
+    a0 U[0,15] P_0.98(a1 || a2) with d = -15, K = 216;

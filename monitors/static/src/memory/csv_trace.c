@@ -122,7 +122,6 @@ r2u2_status_t r2u2_csv_load_next_signals(r2u2_csv_reader_t *trace_reader, r2u2_c
       #endif
   }
   #endif
-
-  R2U2_DEBUG_PRINT("Returning here....\n");
+  
   return R2U2_OK;
 }
