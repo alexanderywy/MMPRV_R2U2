@@ -34,11 +34,11 @@ included in r2u2/ and its sub-directories. As a brief overview:
 
 5) Run R2U2:
     
-        ./monitor/build/r2u2 "path/to/spec.bin" "path/to/input.csv"
+        ./monitors/static/build/r2u2 "path/to/spec.bin" "path/to/input.csv"
 
 - If assigning probabilities to each **atomic** value, run:
 
-        ./monitor/build/r2u2 "path/to/r2u2_spec.bin" "path/to/input.csv" "path/to/atomic_prob.csv"
+        ./monitors/static/build/r2u2 "path/to/r2u2_spec.bin" "path/to/input.csv" "path/to/atomic_prob.csv"
 
 5) Examine the output `R2U2.log` file, note that aggregated writes means some
 timestamps will appear to be "skipped" - this is normal.

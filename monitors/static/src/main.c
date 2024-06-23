@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include "time.h"
 
 #include "internals/errors.h"
 #include "memory/instruction.h"
@@ -181,14 +182,19 @@ int main(int argc, char const *argv[]) {
       return 1;
     }
   }
-
-  // Main processing loop
+  
+  FILE* file_timings;
+  file_timings = fopen("../r2u2_timings_K_216_N_20.csv", "w");
   do {
     err_cond = r2u2_csv_load_next_signals(&r2u2_trace_csv_reader, &r2u2_prob_csv_reader, &r2u2_monitor);
     if ((err_cond != R2U2_OK)) break;
-
+    
+    clock_t t = clock();
     err_cond = r2u2_tic(&r2u2_monitor);
+    if(fprintf(file_timings,"%f\n",((double)(clock()-t))/CLOCKS_PER_SEC) < 0)
+    	printf("Didn't write");
   } while (err_cond == R2U2_OK);
+  fclose(file_timings);
 
   if (err_cond == R2U2_END_OF_TRACE) {
     // Traces are allowed to end, exit cleanly
