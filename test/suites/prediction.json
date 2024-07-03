@@ -29,11 +29,7 @@
             "mltl":  "mmprv0003.c2po",
             "trace":  "mmprv0003.csv",
             "prob_trace": "mmprv0003_prob.csv",
-            "oracle":  "mmprv0003.log",
-            "options": {
-                "booleanizer": false,
-                "atomic-checkers": false
-            }
+            "oracle":  "mmprv0003.log"
         },
         {
             "name": "mmprv mmTransformer",

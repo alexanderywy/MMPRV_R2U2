@@ -281,15 +281,8 @@ r2u2_status_t r2u2_mltl_ft_update(r2u2_monitor_t *monitor, r2u2_mltl_instruction
               r2u2_scq_state_t prev_real_state[R2U2_MAX_INSTRUCTIONS];
               size_t num_mltl_instructions = 0;
               size_t num_load_instructions = monitor->prog_count - instr->memory_reference; // Number of BZ or AT instructions
-              if(num_load_instructions == 0){
-                r2u2_instruction_t* load_instructions[R2U2_MAX_INSTRUCTIONS];
-                r2u2_status_t status = find_child_instructions(monitor, &(*monitor->instruction_tbl)[monitor->prog_count], mltl_instructions, &num_mltl_instructions, 
-                                                             load_instructions, &num_load_instructions, monitor->prog_count - instr->memory_reference);
-              }
-              else{
-                r2u2_status_t status = find_child_instructions(monitor, &(*monitor->instruction_tbl)[monitor->prog_count], mltl_instructions, &num_mltl_instructions, 
-                                                            NULL, NULL, monitor->prog_count - instr->memory_reference);
-              }
+              r2u2_status_t status = find_child_instructions(monitor, &(*monitor->instruction_tbl)[monitor->prog_count], mltl_instructions, &num_mltl_instructions, 
+                                                            monitor->prog_count - instr->memory_reference);
               prep_prediction_scq(monitor, mltl_instructions, instr, prev_real_state, num_mltl_instructions);
               // Keep track of original monitor values
               r2u2_signal_vector_t *signal_vector_original = monitor->signal_vector;
@@ -305,7 +298,6 @@ r2u2_status_t r2u2_mltl_ft_update(r2u2_monitor_t *monitor, r2u2_mltl_instruction
                 // Load in atomics/signals
                 // Note, we calculate for both atomic values and probability whether we care about both or not
                 r2u2_float temp_prob_buffer[monitor->num_atomics];
-                r2u2_bool temp_atomic_buffer[monitor->num_atomics];
                 for(int j = 0; j < (int)predict->k_modes; j++){
                   // Slide atomic_prob_buffer over to the current mode at the current predicted time step
                   monitor->atomic_prob_buffer = &(*(atomic_prob_buffer_original))[(*(monitor->k_offset_buffer)[1])[j]+(iteration*monitor->num_atomics)];
@@ -338,33 +330,11 @@ r2u2_status_t r2u2_mltl_ft_update(r2u2_monitor_t *monitor, r2u2_mltl_instruction
                     }
                     else if((*monitor->instruction_tbl)[i].engine_tag == R2U2_ENG_AT){
                       // To-Do: Atomic checker currently not supported within MMPRV
+                      error_cond = R2U2_INVALID_INST;
+                      break;
                     }
-                    else if((*monitor->instruction_tbl)[i].engine_tag == R2U2_ENG_TL){ // Loading atomics directly
-                      r2u2_mltl_instruction_t* load_instr = ((r2u2_mltl_instruction_t*)(*monitor->instruction_tbl)[i].instruction_data);
-                      // Slide atomic_buffer over to the current mode at the current predicted time step
-                      monitor->atomic_buffer[0] = &(*(atomic_vector_original))[(*(monitor->k_offset_buffer)[1])[j]+(iteration*monitor->num_atomics)];
-                      if(j != 0) {
-                        r2u2_float prev_prob = temp_prob_buffer[load_instr->op1_value];
-                        r2u2_bool prev_atomic = temp_atomic_buffer[load_instr->op1_value];
-                        if(prev_atomic && !((*(monitor->atomic_buffer)[0])[load_instr->op1_value])){ // Going from true to false
-                          temp_prob_buffer[load_instr->op1_value] = (*(monitor->atomic_prob_buffer))[load_instr->op1_value];
-                          temp_atomic_buffer[load_instr->op1_value] = false;
-                        }else if(prev_atomic == ((*(monitor->atomic_buffer)[0])[load_instr->op1_value])){ // Staying same atomic value
-                          temp_prob_buffer[load_instr->op1_value] = prev_prob + (*(monitor->atomic_prob_buffer))[load_instr->op1_value];
-                        }else{ // Value is false and will remain false even if true for one mode
-                          temp_atomic_buffer[load_instr->op1_value] = prev_atomic;
-                        }
-                      } else{
-                        // Initialize temp_atomic_buffer and temp_prob_buffer
-                        temp_atomic_buffer[load_instr->op1_value] = (*(monitor->atomic_buffer)[0])[load_instr->op1_value];
-                        temp_prob_buffer[load_instr->op1_value] = (*(monitor->atomic_prob_buffer))[load_instr->op1_value];
-                      }
-                      if(i == 0){
-                        // Point the atomic_buffer to the new atomic values calculated using MMPRV
-                        monitor->atomic_buffer[0] = &temp_atomic_buffer;
-                      }
-                    }
-                    else{
+                    else { // Loading atomics directly
+                      // To-Do: Loading atomics directly currently not supported within MMPRV
                       error_cond = R2U2_INVALID_INST;
                       break;
                     }
