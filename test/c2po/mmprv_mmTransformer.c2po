@@ -5,4 +5,4 @@ DEFINE
     a := sqrt(((x_1 - x_2) pow 2.0) + ((y_1 - y_2) pow 2.0)) > 1.7;
 
 FTSPEC
-    P_0.95(G[0,30] a) with d = 0, K = 6;
+    P_0.90(G[0,30] a) with d = 0, K = 36;
